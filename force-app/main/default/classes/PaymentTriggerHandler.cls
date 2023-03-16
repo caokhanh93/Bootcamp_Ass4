@@ -1,6 +1,8 @@
 public with sharing class PaymentTriggerHandler {
-    List<sObject> triggerOld = new List<sObject>();
-    List<sObject> triggerNew = new List<sObject>();
+    List<Payment__c> triggerOld = new List<Payment__c>();
+    List<Payment__c> triggerNew = new List<Payment__c>();
+
+    private String DONE_STATUS = 'DONE';
 
     public PaymentTriggerHandler() {
     }
@@ -13,13 +15,25 @@ public with sharing class PaymentTriggerHandler {
     public void beforeInsert() {
         
     }
-    public void beforeInsert() {
+    public void afterInsert() {
 
     }
-    public void beforeInsert() {
+    public void beforeUpdate() {
+        updateFinalAmount();
+    }
+    public void afterUpdate() {
 
     }
-    public void beforeInsert() {
 
+    private void updateFinalAmount() {
+        List<Payment__c> updatePms = new List<Payment__c>();
+        for (Payment__c pm : this.triggerNew) {
+            if (pm.Status__c == this.DONE_STATUS && pm.Final_Amount__c == null) {
+                Payment__c newPm = new Payment__c();
+                newPm.Final_Amount__c = pm.Amount__c;
+                updatePms.add(pm);
+            }
+        }
+        update updatePms;
     }
 }
