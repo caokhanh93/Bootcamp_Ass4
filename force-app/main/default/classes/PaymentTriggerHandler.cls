@@ -4,28 +4,38 @@ public with sharing class PaymentTriggerHandler {
 
     private String DONE_STATUS = 'DONE';
 
+    // Constructor
     public PaymentTriggerHandler() {
     }
-
+    // Constructor
     public PaymentTriggerHandler(Map<Id, Payment__c> oldMap, List<Payment__c> newList) {
         this.oldMap = oldMap;
         this.newList = newList;
     }
-
+    // Logic run on before insert
     public void beforeInsert() {
         
     }
+    // Logic run on after insert
     public void afterInsert() {
         autoCreateTask();
     }
+    // Logic run on before update
     public void beforeUpdate() {
         updateFinalAmount();
         preventChangeStatus();
     }
+    // Logic run on after update
     public void afterUpdate() {
 
     }
-
+    /**
+     * tự động update Final Amount = Amount 
+     * khi Status chuyển thành Done nếu Final Amount không được nhập dữ liệu
+     * 
+     * params: 
+     * return: 
+     */
     private void updateFinalAmount() {
         for (Payment__c pm : this.newList) {
             if (pm.Status__c == this.DONE_STATUS && pm.Final_Amount__c == null) {
@@ -33,7 +43,12 @@ public with sharing class PaymentTriggerHandler {
             }
         }
     }
-
+    /**
+     * Ngawn người dùng chuyển status từ Done sang các giá trị khác
+     * 
+     * params: 
+     * return: 
+     */
     private void preventChangeStatus() {
         List<Payment__c> updatePms = new List<Payment__c>();
         for (Payment__c pm : this.newList) {
@@ -43,7 +58,12 @@ public with sharing class PaymentTriggerHandler {
             }
         }
     }
-
+    /**
+     * Tự động tạo task cho owner khi một payment được tạo ra với payment method là Chuyển Khoản 
+     * 
+     * params: 
+     * return: 
+     */
     private void autoCreateTask() {
         List<Task> tasks = new List<Task>();
         for (Payment__c pm : this.newList) {
