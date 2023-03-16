@@ -1,5 +1,5 @@
 trigger PaymentTrigger on Payment__c (before insert, after insert, before update, after update) {
-    PaymentTriggerHandler handler = new PaymentTriggerHandler(Trigger.old, Trigger.new);
+    PaymentTriggerHandler handler = new PaymentTriggerHandler(Trigger.oldMap, Trigger.new);
 
     if (Trigger.isBefore & Trigger.isInsert) {
         handler.beforeInsert();
